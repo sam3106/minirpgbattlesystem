@@ -1,38 +1,74 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import Header from './Header';
-import Body from './Body';
-
+import './index.css';
 class App extends React.Component {
   constructor() {
     super();
-    const promp = window.prompt('what will the name of your character be?', '');
+    const promp = window.prompt(
+      'what will the name of your character be?',
+      'John Smith'
+    );
+
     this.state = {
-      player: {
-        player: promp,
-        health: 90,
-        attack: 12,
-        cry: `{player} cries in the corner`
-      },
-      monster: { health: 102, attack: 7 }
+      counter: 0,
+      player: promp,
+      playerHealth: 90,
+      playerAttack: 12,
+      monsterHealth: 120,
+      monsterAttack: 10,
+      Winner: ''
     };
   }
-  playerAction = () => {
-    const attack = this.state.monster.health - this.state.player.attack;
-    const cry = this.state.player.cry;
+
+  gameAction = () => {
+    let counter = this.state.counter;
+    const player = this.state.player;
+    const counterUp = this.state.counter + 1;
+    const attackMonster = this.state.monsterHealth - this.state.playerAttack;
+    const attackPlayer = this.state.playerHealth - this.state.monsterAttack;
+    const humanWin = 'Congrats ' + player + ' you won';
+    const monsterWin = 'Too Bad ' + player + ' you lost';
+    if (counter <= 1) {
+      this.setState(
+        { monsterHealth: attackMonster, counter: counterUp },
+        () => {
+          if (this.state.monsterHealth === 0) {
+            this.setState({ Winner: humanWin });
+            setTimeout(function() {
+              window.location.reload(1);
+            }, 2000);
+          }
+        }
+      );
+    } else if (counter == 2) {
+      if (this.state.playerHealth === 0) {
+        this.setState({ Winner: monsterWin });
+        setTimeout(function() {
+          window.location.reload(1);
+        }, 2000);
+      }
+      this.setState({
+        playerHealth: attackPlayer,
+        counter: 0
+      });
+    }
   };
-  monsterAction = () => {
-    const attack = this.state.player.health - this.state.monster.attack;
-  };
+
   render() {
     return (
       <div>
         <Header
-          playerHealth={this.state.player.health}
-          monsterHealth={this.state.monster.health}
-          playerName={this.state.player.player}
+          playerHealth={this.state.playerHealth}
+          monsterHealth={this.state.monsterHealth}
+          playerName={this.state.player}
         />
-        <Body />
+        <button type="button" onClick={this.gameAction}>
+          Attack
+        </button>
+        <div>
+          <h1>{this.state.Winner}</h1>
+        </div>
       </div>
     );
   }
